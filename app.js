@@ -1,205 +1,101 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const password = require('./utils/password');
-
-const Book = require('./models/Book');
+const express = require("express");
+const mongoose = require("mongoose");
+const password = require("./utils/password");
+const Book = require("./models/Book"); // Modèle des livres
 
 // Connexion à la base de données
-mongoose.connect(`mongodb+srv://magnusfox:${password}@cluster0.69g5w.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`,
-  { useNewUrlParser: true, // Obsolète depuis la version 4.0.0 de Node.js
-    useUnifiedTopology: true }) // Obsolète depuis la version 4.0.0 de Node.js
-  .then(() => console.log('Connexion à MongoDB réussie !'))
-  .catch(() => console.log('Connexion à MongoDB échouée !'));
+mongoose
+  .connect(
+    `mongodb+srv://magnusfox:${password}@cluster0.69g5w.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+  )
+  .then(() => console.log("Connexion à MongoDB réussie !"))
+  .catch(() => console.log("Connexion à MongoDB échouée !"));
 
 // Création de l'application
 const app = express();
-// Middleware permettant à Express d'extraire le corps JSON des requêtes POST
-app.use(express.json());
 
 // Middleware gérant les erreurs de CORS
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+  );
   next();
 });
 
+// Middleware pour extraire le corps JSON des requêtes
+app.use(express.json());
 
+/* -------------------- AUTH ROUTES -------------------- */
 
-// Création des livres (provisoire)
-const books = [
-  {
-    "id": "1",
-    "userId": "clc4wj5lh3gyi0ak4eq4n8syr",
-    "title": "Milwaukee Mission",
-    "author": "Elder Cooper",
-    "imageUrl": "https://via.placeholder.com/206x260",
-    "year": 2021,
-    "genre": "Policier",
-    "ratings": [
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "clc4wj5lh3gyi0ak4eq4n8syr", "grade": 5 },
-      { "userId": "1", "grade": 5 }
-    ],
-    "averageRating": 3
-  },
-  {
-    "id": "2",
-    "userId": "clbxs3tag6jkr0biul4trzbrv",
-    "title": "Book for Esther",
-    "author": "Alabaster",
-    "imageUrl": "https://via.placeholder.com/206x260",
-    "year": 2022,
-    "genre": "Paysage",
-    "ratings": [
-      { "userId": "clbxs3tag6jkr0biul4trzbrv", "grade": 4 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 }
-    ],
-    "averageRating": 4.2
-  },
-  {
-    "id": "3",
-    "userId": "1",
-    "title": "The Kinfolk Table",
-    "author": "Nathan Williams",
-    "imageUrl": "https://via.placeholder.com/206x260",
-    "year": 2022,
-    "genre": "Cuisine",
-    "ratings": [
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 }
-    ],
-    "averageRating": 3
-  },
-  {
-    "id": "4",
-    "userId": "1",
-    "title": "Milwaukee Mission",
-    "author": "Elder Cooper",
-    "imageUrl": "https://via.placeholder.com/206x260",
-    "year": 2021,
-    "genre": "Policier",
-    "ratings": [
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 }
-    ],
-    "averageRating": 3
-  },
-  {
-    "id": "5",
-    "userId": "1",
-    "title": "Book for Esther",
-    "author": "Alabaster",
-    "imageUrl": "https://via.placeholder.com/206x260",
-    "year": 2022,
-    "genre": "Paysage",
-    "ratings": [
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 }
-    ],
-    "averageRating": 4
-  },
-  {
-    "id": "6",
-    "userId": "1",
-    "title": "The Kinfolk Table",
-    "author": "Nathan Williams",
-    "imageUrl": "https://via.placeholder.com/206x260",
-    "year": 2022,
-    "genre": "Cuisine",
-    "ratings": [
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 }
-    ],
-    "averageRating": 3
-  },
-  {
-    "id": "7",
-    "userId": "1",
-    "title": "Milwaukee Mission",
-    "author": "Elder Cooper",
-    "imageUrl": "https://via.placeholder.com/206x260",
-    "year": 2021,
-    "genre": "Policier",
-    "ratings": [
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 }
-    ],
-    "averageRating": 3
-  },
-  {
-    "id": "8",
-    "userId": "clc7s9xnh7zpt0ak4fisdwuj1",
-    "title": "Book for Esther",
-    "author": "Alabaster",
-    "imageUrl": "https://via.placeholder.com/206x260",
-    "year": 2022,
-    "genre": "Paysage",
-    "ratings": [
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 }
-    ],
-    "averageRating": 4
-  },
-  {
-    "id": "9",
-    "userId": "clc4wj5lh3gyi0ak4eq4n8syr",
-    "title": "The Kinfolk Table",
-    "author": "Nathan Williams",
-    "imageUrl": "https://via.placeholder.com/206x260",
-    "year": 2022,
-    "genre": "Cuisine",
-    "ratings": [
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "1", "grade": 5 },
-      { "userId": "clc4wj5lh3gyi0ak4eq4n8syr", "grade": 1 }
-    ],
-    "averageRating": 3
-  }
-];
-
-// Route des 3 meilleurs livres (GET)
-app.get('/api/books/bestRating', (req, res) => {
-  const topRatedBooks = books
-    .sort((a, b) => b.averageRating - a.averageRating) // Tri par averageRating décroissant
-    .slice(0, 3); // Ne garder que les 3 meilleurs
-    console.log('Les 3 livres on été récupéré avec succès !');
-  res.status(200).json(topRatedBooks); // Renvoie les 3 meilleurs livres
-});
-
-// Route de récupération des livres (GET)
-app.get('/api/books', (req, res) => {
-  res.status(200).json(books);
-});
-
-// Route de récupération d'un livre spécifique par son id (GET)
-app.get('/api/books/:id', (req, res) => {
-  const bookId = req.params.id;
-  const book = books.find(b => b.id === bookId);
-  if (book) {
-    res.status(200).json(book);
+// Route pour l'inscription (POST)
+app.post('/api/auth/signup', (req, res) => {
+  const { email, password } = req.body;
+  if (email && password) {
+    // Logique pour créer un utilisateur et hacher le mot de passe.
+    res.status(201).json({ message: 'Utilisateur créé avec succès' });
   } else {
-    console.log('Livre non trouvé');
-    res.status(404).json({ message: 'Livre non trouvé !' });
+    res.status(400).json({ message: 'Données manquantes' });
   }
 });
 
+// Route pour la connexion (POST)
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body;
+  if (email && password) {
+    // Logique pour la connexion (validation des identifiants).
+    res.status(202).json({ message: 'Connexion réussie !' });
+  } else {
+    res.status(400).json({ message: 'Identifiants manquants' });
+  }
+});
 
+/* -------------------- BOOK ROUTES -------------------- */
 
+// Route GET pour récupérer les 3 livres les mieux notés
+app.get('/api/books/bestrating', async (req, res) => {
+  try {
+    const books = await Book.find();
+    // Vérifie si des livres ont été trouvés
+    if (!books || books.length === 0) {
+      return res.status(404).json({ message: 'Aucun livre trouvé' });
+    }
+    const sortedBooks = books.sort((a, b) => b.averageRating - a.averageRating);
+    const topRatedBooks = sortedBooks.slice(0, 3); // Limitation à 3 Livres
+    // Retourner les livres triés
+    res.status(200).json(topRatedBooks);
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur lors de la récupération des livres', error: error.message });
+  }
+});
+
+// Route GET pour récupérer tous les livres
+app.get('/api/books', async (req, res) => {
+  try {
+    const books = await Book.find();
+    res.status(200).json(books);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Route GET pour récupérer un livre spécifique par ID
+app.get('/api/books/:id', async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id);
+    if (!book) {
+      return res.status(404).json({ message: 'Livre non trouvé' });
+    }
+    res.status(200).json(book);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Exportation de l'application
 module.exports = app;
