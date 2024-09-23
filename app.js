@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const password = require("./utils/password");
 
 const bookRoutes = require("./routes/book");
+const userRoutes = require("./routes/user");
 
 // Connexion à la base de données
 mongoose
@@ -31,34 +32,8 @@ app.use((req, res, next) => {
 // Middleware pour extraire le corps JSON des requêtes
 app.use(express.json());
 
-
-/* -------------------- AUTH ROUTES -------------------- */
-
-// Route pour l'inscription (POST)
-app.post('/api/auth/signup', (req, res) => {
-  const { email, password } = req.body;
-  if (email && password) {
-    // Logique pour créer un utilisateur et hacher le mot de passe.
-    res.status(201).json({ message: 'Utilisateur créé avec succès' });
-  } else {
-    res.status(400).json({ message: 'Données manquantes' });
-  }
-});
-
-// Route pour la connexion (POST)
-app.post('/api/auth/login', (req, res) => {
-  const { email, password } = req.body;
-  if (email && password) {
-    // Logique pour la connexion (validation des identifiants).
-    res.status(202).json({ message: 'Connexion réussie !' });
-  } else {
-    res.status(400).json({ message: 'Identifiants manquants' });
-  }
-});
-
-/* -------------------- BOOK ROUTES -------------------- */
-
 app.use('/api/books', bookRoutes);
+app.use('/api/auth', userRoutes);
 
 // Exportation de l'application
 module.exports = app;

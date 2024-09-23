@@ -1,6 +1,6 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const bookCtrl = require('../controllers/book');
+const bookCtrl = require("../controllers/book");
 
 // Route GET pour récupérer tous les livres
 router.get('/', bookCtrl.getAllBooks);
