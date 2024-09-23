@@ -1,13 +1,13 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const password = require("./utils/password");
-const Book = require("./models/Book"); // Modèle des livres
+
+const bookRoutes = require("./routes/book");
 
 // Connexion à la base de données
 mongoose
   .connect(
-    `mongodb+srv://magnusfox:${password}@cluster0.69g5w.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
-  )
+    `mongodb+srv://magnusfox:${password}@cluster0.69g5w.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
   .then(() => console.log("Connexion à MongoDB réussie !"))
   .catch(() => console.log("Connexion à MongoDB échouée !"));
 
@@ -30,6 +30,7 @@ app.use((req, res, next) => {
 
 // Middleware pour extraire le corps JSON des requêtes
 app.use(express.json());
+
 
 /* -------------------- AUTH ROUTES -------------------- */
 
@@ -57,45 +58,7 @@ app.post('/api/auth/login', (req, res) => {
 
 /* -------------------- BOOK ROUTES -------------------- */
 
-// Route GET pour récupérer les 3 livres les mieux notés
-app.get('/api/books/bestrating', async (req, res) => {
-  try {
-    const books = await Book.find();
-    // Vérifie si des livres ont été trouvés
-    if (!books || books.length === 0) {
-      return res.status(404).json({ message: 'Aucun livre trouvé' });
-    }
-    const sortedBooks = books.sort((a, b) => b.averageRating - a.averageRating);
-    const topRatedBooks = sortedBooks.slice(0, 3); // Limitation à 3 Livres
-    // Retourner les livres triés
-    res.status(200).json(topRatedBooks);
-  } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de la récupération des livres', error: error.message });
-  }
-});
-
-// Route GET pour récupérer tous les livres
-app.get('/api/books', async (req, res) => {
-  try {
-    const books = await Book.find();
-    res.status(200).json(books);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Route GET pour récupérer un livre spécifique par ID
-app.get('/api/books/:id', async (req, res) => {
-  try {
-    const book = await Book.findById(req.params.id);
-    if (!book) {
-      return res.status(404).json({ message: 'Livre non trouvé' });
-    }
-    res.status(200).json(book);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
+app.use('/api/books', bookRoutes);
 
 // Exportation de l'application
 module.exports = app;
