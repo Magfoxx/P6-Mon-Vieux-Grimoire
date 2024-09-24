@@ -4,6 +4,7 @@ const password = require("./utils/password");
 
 const bookRoutes = require("./routes/book");
 const userRoutes = require("./routes/user");
+const path = require('path');
 
 // Connexion à la base de données
 mongoose
@@ -29,11 +30,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware pour extraire le corps JSON des requêtes
+// Middleware pour extraire le corps JSON des requêtes POST
 app.use(express.json());
 
 app.use('/api/books', bookRoutes);
 app.use('/api/auth', userRoutes);
+
+// Gestion de la ressource images de manière statique
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // Exportation de l'application
 module.exports = app;
