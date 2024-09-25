@@ -1,18 +1,20 @@
+// Charge les variables d'environnement à partir du fichier .env
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const password = require("./utils/password");
+
+// Récupération de la chaîne de connexion MongoDB depuis le fichier .env
+const mongoUri = process.env.MONGO_URI;
 
 const bookRoutes = require("./routes/book");
 const userRoutes = require("./routes/user");
-const path = require('path');
+const path = require("path");
 
-// Connexion à la base de données
+// Connexion à MongoDB
 mongoose
-  .connect(
-    `mongodb+srv://magnusfox:${password}@cluster0.69g5w.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
+  .connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Connexion à MongoDB réussie !"))
-  .catch(() => console.log("Connexion à MongoDB échouée !"));
-
+  .catch((err) => console.log("Connexion à MongoDB échouée !", err));
 // Création de l'application
 const app = express();
 
@@ -33,11 +35,11 @@ app.use((req, res, next) => {
 // Middleware pour extraire le corps JSON des requêtes POST
 app.use(express.json());
 
-app.use('/api/books', bookRoutes);
-app.use('/api/auth', userRoutes);
+app.use("/api/books", bookRoutes);
+app.use("/api/auth", userRoutes);
 
 // Gestion de la ressource images de manière statique
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 // Exportation de l'application
 module.exports = app;

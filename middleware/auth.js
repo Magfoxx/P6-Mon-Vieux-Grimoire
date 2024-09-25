@@ -1,3 +1,4 @@
+// Importation de la bibliothèque jsonwebtoken qui permet de creer et vérifier les JSON Web Tokens
 const jwt = require('jsonwebtoken')
 
 // Middleware d'authentification
@@ -16,4 +17,4 @@ module.exports = (req, res, next) => {
   } catch(error) {
     res.status(401).json({ error })
   }
-}
+};

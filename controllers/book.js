@@ -18,7 +18,7 @@ exports.createBook = (req, res, next) => {
   
   book.save()
   res.status(201).json({message: 'Livre enregistré !'})
-}
+};
 
 // GET => Récupération d'un livre via l'ID
 exports.getBookById = (req, res, next) => {
@@ -29,7 +29,7 @@ exports.getBookById = (req, res, next) => {
   .catch((error) => {
     res.status(404).json({error: error})
   })
-}
+};
 
 // PUT => Modification d'un livre
 exports.updateBook = (req, res, next) => {
@@ -66,7 +66,7 @@ exports.updateBook = (req, res, next) => {
   .catch((error) => {
     res.status(400).json({ error })
   })
-}
+};
 
 // DELETE => Suppression d'un livre
 exports.deleteBook = (req, res, next) => {
@@ -92,7 +92,7 @@ exports.deleteBook = (req, res, next) => {
   .catch((error) => {
     res.status(500).json({ error })
   })
-}
+};
 
 // GET => Récupération de tous les livres
 exports.getAllBooks = (req, res, next) => {
@@ -104,7 +104,7 @@ exports.getAllBooks = (req, res, next) => {
       res.status(400).json({error: error})
     }
   )
-}
+};
 
 // POST => Création d'une note
 exports.rateBook = (req, res, next) => {
@@ -146,7 +146,7 @@ exports.rateBook = (req, res, next) => {
   } else {
     res.status(400).json({ message: 'La note doit être comprise entre 1 et 5' })
   }
-}
+};
 
 // GET => Récupération des 3 livres les mieux notés
 exports.getBooksByBestRating = (req, res, next) => {
@@ -159,4 +159,4 @@ exports.getBooksByBestRating = (req, res, next) => {
   .catch(error => {
     res.status(400).json({ error: error.message })
   })
-}
+};
