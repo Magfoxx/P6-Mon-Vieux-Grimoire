@@ -17,11 +17,11 @@ exports.createBook = (req, res, next) => {
   })
   
   book.save()
-  res.status(201).json({message: 'Livre enregistré !'})
-};
+  res.status(201).json({message: 'Objet enregistré !'})
+}
 
 // GET => Récupération d'un livre via l'ID
-exports.getBookById = (req, res, next) => {
+exports.getOneBook = (req, res, next) => {
   Book.findOne({_id: req.params.id})
   .then((book) => {
     res.status(200).json(book)
@@ -29,10 +29,10 @@ exports.getBookById = (req, res, next) => {
   .catch((error) => {
     res.status(404).json({error: error})
   })
-};
+}
 
 // PUT => Modification d'un livre
-exports.updateBook = (req, res, next) => {
+exports.modifyBook = (req, res, next) => {
 
   // Récupération de la requête et nettoyage
   const bookObject = req.file ? {
@@ -48,7 +48,7 @@ exports.updateBook = (req, res, next) => {
 
     // Vérification de l'ID de l'auteur
     if (book.userId != req.auth.userId) {
-      res.status(403).json({ message : 'Non-autorisé !'})
+      res.status(403).json({ message : 'Not authorized'})
     } else {
 
       if (req.file) {
@@ -59,14 +59,14 @@ exports.updateBook = (req, res, next) => {
 
       // Mise à jour du livre
       Book.updateOne({ _id: req.params.id}, { ...bookObject, _id: req.params.id})
-      .then(() => res.status(200).json({message : 'Livre modifié !'}))
+      .then(() => res.status(200).json({message : 'Objet modifié !'}))
       .catch(error => res.status(401).json({ error }))
     }
   })
   .catch((error) => {
     res.status(400).json({ error })
   })
-};
+}
 
 // DELETE => Suppression d'un livre
 exports.deleteBook = (req, res, next) => {
@@ -77,14 +77,14 @@ exports.deleteBook = (req, res, next) => {
 
     // Vérification de l'ID de l'auteur
     if (book.userId != req.auth.userId) {
-      res.status(401).json({message: 'Non-autorisé !'})
+      res.status(401).json({message: 'Not authorized'})
     } else {
 
       // Suppression de l'image puis du livre
       const filename = book.imageUrl.split('/images/')[1]
       fs.unlink(`images/${filename}`, () => {
         Book.deleteOne({_id: req.params.id})
-        .then(() => { res.status(200).json({message: 'Livre supprimé !'})})
+        .then(() => { res.status(200).json({message: 'Objet supprimé !'})})
         .catch(error => res.status(401).json({ error }))
       })
     }
@@ -92,7 +92,7 @@ exports.deleteBook = (req, res, next) => {
   .catch((error) => {
     res.status(500).json({ error })
   })
-};
+}
 
 // GET => Récupération de tous les livres
 exports.getAllBooks = (req, res, next) => {
@@ -104,7 +104,7 @@ exports.getAllBooks = (req, res, next) => {
       res.status(400).json({error: error})
     }
   )
-};
+}
 
 // POST => Création d'une note
 exports.rateBook = (req, res, next) => {
@@ -146,10 +146,10 @@ exports.rateBook = (req, res, next) => {
   } else {
     res.status(400).json({ message: 'La note doit être comprise entre 1 et 5' })
   }
-};
+}
 
 // GET => Récupération des 3 livres les mieux notés
-exports.getBooksByBestRating = (req, res, next) => {
+exports.getBestRating = (req, res, next) => {
   Book.find()
   .sort({ averageRating: -1 })  // Tri par note moyenne décroissante
   .limit(3)
@@ -159,4 +159,4 @@ exports.getBooksByBestRating = (req, res, next) => {
   .catch(error => {
     res.status(400).json({ error: error.message })
   })
-};
+}

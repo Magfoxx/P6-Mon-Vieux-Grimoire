@@ -1,5 +1,4 @@
-// Charge les variables d'environnement à partir du fichier .env
-require("dotenv").config();
+require("dotenv").config(); // Charge les variables d'environnement à partir du fichier .env
 const express = require("express");
 const mongoose = require("mongoose");
 
@@ -10,12 +9,12 @@ const bookRoutes = require("./routes/book");
 const userRoutes = require("./routes/user");
 const path = require("path");
 
-// Connexion à MongoDB
+// Connexion à MongoDB via l'URI
 mongoose
-  .connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(mongoUri)
   .then(() => console.log("Connexion à MongoDB réussie !"))
   .catch((err) => console.log("Connexion à MongoDB échouée !", err));
-// Création de l'application
+
 const app = express();
 
 // Middleware gérant les erreurs de CORS
@@ -35,6 +34,7 @@ app.use((req, res, next) => {
 // Middleware pour extraire le corps JSON des requêtes POST
 app.use(express.json());
 
+// Définition des routes pour les livres et l'authentification des utilisateurs
 app.use("/api/books", bookRoutes);
 app.use("/api/auth", userRoutes);
 
